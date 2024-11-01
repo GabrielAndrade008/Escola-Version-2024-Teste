@@ -1,0 +1,50 @@
+yaml
+
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+pull_request:
+branches:
+      -main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      -name: Checkout do Código
+      uses: actions/checkout@v2
+
+-name: Configurar Node.js
+uses: actions/setup-node@v2
+with:
+  node-version: '14'
+
+-name: Instalar Dependências
+run: npm install
+
+-name: Rodar Testes
+run: npm test
+
+-name: Build do Projeto
+run: npm run build
+
+deploy:
+  needs: build
+  runs-on: ubuntu-latest
+
+steps:
+-name: Checkout do Código
+uses: actions/checkout@v2
+
+-name: Deploy para Servidor
+env:
+  FTP_SERVER: ${{ secrets.FTP_SERVER }}
+  FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+  FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+run: |
+  echo "Fazendo upload dos arquivos..."
+  
